@@ -5,7 +5,7 @@ Generic animatable svg elements.
 ## Installation
 
 ```bash
-npm i -S svg-elem
+npm i svg-elem
 ```
 
 ## Usage
@@ -13,10 +13,8 @@ npm i -S svg-elem
 ```js
 import SvgElem from 'svg-elem'
 
-const rootElem = document.getElementById('root')
-
 const svg = new SvgElem({
-    parentDom: rootElem,
+    parentDom: document.getElementById('root'),
     tag: 'svg',
     style: {
         'background': '#eee',
