@@ -2,7 +2,7 @@
   "name": "svg-elem",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "directories": {
     "example": "examples"
   },
@@ -10,10 +10,12 @@
     "tween.js": "^16.6.0"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.4",
     "babel-preset-env": "^1.7.0",
     "css-loader": "^2.1.0",
+    "gh-pages": "^2.0.1",
     "html-webpack-plugin": "^3.2.0",
     "style-loader": "^0.23.1",
     "webpack": "^4.28.4",
@@ -22,7 +24,12 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack-dev-server --mode development"
+    "start": "webpack-dev-server --mode development",
+    "transpile": "babel src -d dist --copy-files",
+	"prepublishOnly": "npm run transpile",
+	"build": "webpack --mode production",
+	"deploy": "gh-pages -d examples/dist",
+	"publish-demo": "npm run build && npm run deploy"
   },
   "repository": {
     "type": "git",
