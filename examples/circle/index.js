@@ -22,7 +22,7 @@ const circle = new SvgElem({
 	style: {
 		'fill': 'white',
 		'stroke': 'black',
-		'stroke-width': '2px',
+		'stroke-width': '10px',
 		'cursor': 'pointer',
 	},
 	attr: {

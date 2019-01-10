@@ -20,10 +20,8 @@ exampleNames.forEach((name)=>{
 		new HtmlWebpackPlugin({
 			// inject: true,
 			template: path.join(__dirname, `examples/${name}/index.html`),
-			// filename: path.join(__dirname, `examples/${name}/index.html`),
-			filename: `${name}.html`,
+			filename: `./dev-server-examples/${name}.html`, // affects path of file hosted by dev server eg. './temp/app.html' --> 'localhost:3001/temp/app.html'
 			chunks: [name], // specify chunks other wise all scripts will be added to every html
-			// path: path.join(__dirname, 'examples/dist'),
 		})
 	)	
 })
@@ -32,7 +30,7 @@ module.exports = {
 	entry: oWebpackEntries,
 	// entry: path.join(__dirname, 'examples/src/index.js'), // Resolve source dependencies using examples/src/index.js as a starting point
 	output: {
-		path: path.join(__dirname, 'examples/dist'),
+		path: path.join(__dirname, 'examples/dist'), // does not effect dev server
 		filename: '[name].bundle.js'
 	},
 	module: {
@@ -55,7 +53,7 @@ module.exports = {
 		extensions: ['.js']
 	},
 	devServer: {
-		contentBase: path.join(__dirname, 'examples'),
+		// contentBase: path.join(__dirname, 'examples'),
 		port: 3001 // Serve the demo on port localhost:3001
 	}
 }
