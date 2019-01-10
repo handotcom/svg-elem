@@ -16,7 +16,7 @@ const svg = new SvgElem({
 	},
 })
 
-new SvgElem({
+const circle = new SvgElem({
 	parentDom: svg.elem,
 	tag: 'circle',
 	style: {
@@ -30,4 +30,11 @@ new SvgElem({
 		'cy': 150,
 		'r': 50,
 	},
+})
+
+
+circle.setAttr({
+	'r': 100,
+},{
+	dur: 1000,
 })

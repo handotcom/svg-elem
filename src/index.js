@@ -1,9 +1,12 @@
-// import TWEEN from 'tween.js'
+import TWEEN from 'tween.js'
+import ClockPoll from './ClockPoll'
 import { 
 	XMLNS_XLINK,
 	createSvgElement, 
 	purgeOwnKeys,
+	plinePtConvert,
 } from './util'
+
 
 
 function SvgElem(op) {
@@ -101,19 +104,6 @@ SvgElem.prototype.removeEventListeners = function () {
     }
 }
 
-// return array 2D
-function plinePtConvert(pointsAttr) {
-    if (typeof pointsAttr === 'string') {
-        return pointsAttr.split(/[\s,]+/).map(str => +str)
-    }
-    if (Array.isArray(pointsAttr)) {
-        return pointsAttr
-        // return pointsAttr.map(function(str){
-        // 	return str.split(',')
-        // })
-    }
-}
-
 SvgElem.prototype.setAttr = function (attr, anim) {
     const { elem, props } = this
     if (anim) { // animate to new attributes...
@@ -126,9 +116,9 @@ SvgElem.prototype.setAttr = function (attr, anim) {
             case 'linear': easing = TWEEN.Easing.Linear.None; break
             default: easing = TWEEN.Easing.Cubic.InOut
         }
-        let current, endState
-        // eg. <polyline points="20,20 40,25"/>
-        let plineAttrPoint = {}
+	  
+		let current, endState
+		let plineAttrPoint = {} // eg. <polyline points="20,20 40,25"/>
 
         for (let key in attr) {
             if (
@@ -163,7 +153,7 @@ SvgElem.prototype.setAttr = function (attr, anim) {
             }
         }
 
-        if (this.current !== null) {
+		if (this.current !== null) {
             return this.animateAttr(dur, easing).then(() => {
                 Object.assign(this.props.attr, attr) // overwrite props after animation has finished...
             })
@@ -197,6 +187,8 @@ SvgElem.prototype.setAttr = function (attr, anim) {
 SvgElem.prototype.animateAttr = function (dur, easing) {
     const { current, endState, elem } = this
     return new Promise((resolve) => {
+		if(!ClockPoll.isActive()) ClockPoll.start()
+
         // console.log('current -> end', current, {val:attr[key]})
         new TWEEN.Tween(current)
             .to(endState, dur)
@@ -220,7 +212,7 @@ SvgElem.prototype.animateAttr = function (dur, easing) {
                 }
             })
             .onComplete(() => {
-                resolve()
+				resolve()
             })
             .start()
     })
@@ -235,7 +227,7 @@ SvgElem.prototype.setText = function (val) {
             elem.textContent = val
         } break
         case 'object': { // array of text items...
-            if (val instanceof Array) {
+            if (Array.isArray(val)) {
                 // NOTE: 'alignment-baseline' does not work on tspans
                 // <tspan dx="50,10,10,0,5" dy="50,10,10,10">SVG 2</tspan>
                 const { x } = props.attr
@@ -273,32 +265,27 @@ SvgElem.prototype.setText = function (val) {
 
 SvgElem.prototype.setStyle = function (style, anim) {
     const { elem, props } = this
-    let key, val, shouldRerenderText = false
+	let key,
+		changeCount = 0
     for (key in style) {
-        val = style[key]
         if (
             style.hasOwnProperty(key)
-            && val !== props.style[key] // if value changed...
+			&& style[key] !== props.style[key] // if value changed...
         ) {
-
+			elem.style[key] = style[key]
+			changeCount += 1
             if (props.tag === 'text') {
                 if (key === 'font-family' || key === 'font-size') {
-                    this.textLineHeight = null // reset line height on font change
-                    shouldRerenderText = true
+					this.textLineHeight = null // reset line height on font change			
+					this.setText(props.text)
                 }
             }
-            elem.style[key] = val
         }
     }
 
-    Object.assign(props.style, style) // overwrite props with nextProps
-
-    if (shouldRerenderText) {
-        this.setText(this.props.text)
-    }
-
+	if (changeCount > 0){
+		Object.assign(props.style, style) // overwrite props with nextProps
+	}    
 }
-
-
 
 export default SvgElem
