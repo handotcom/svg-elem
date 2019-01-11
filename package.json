@@ -1,7 +1,7 @@
 {
   "name": "svg-elem",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.1",
+  "description": "Generic animatable svg element creator",
   "main": "dist/index.js",
   "directories": {
     "example": "examples"

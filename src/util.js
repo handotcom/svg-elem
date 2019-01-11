@@ -19,7 +19,6 @@ export function createSvgElement(tag, parentDom) {
 	return elem
 }
 
-
 /**
  * Purge object's own keys
  * @param {Object} obj - An object

@@ -5,12 +5,16 @@ import {
 } from './util'
 
 
+export interface iAnimStateObj {
+	[index: string]: number
+}
+
 class TweenSingle {
 	private id: string 
-	private startState: object 
-	private userStateObj: object 
-	private stateDeltas: object 
-	private endState: object 
+	private startState: iAnimStateObj 
+	private userStateObj: iAnimStateObj 
+	private stateDeltas: iAnimStateObj 
+	private endState: iAnimStateObj 
 
 	private onUpdateCallback: Function 
 	private onCompleteCallback: Function 
@@ -18,13 +22,13 @@ class TweenSingle {
 	private animDur: number 
 	private easingFunction: Function = EASE.InOutCubic
 
-	constructor(userStateObj){
+	constructor(userStateObj: iAnimStateObj){
 		this.startState = Object.assign({}, userStateObj)
 		this.userStateObj = userStateObj
 		return this
 	}
 
-	public to(endState: object, animDur: number): TweenSingle {
+	public to(endState: iAnimStateObj, animDur: number): TweenSingle {
 		const { startState } = this
 		this.endState = endState
 		this.animDur = animDur

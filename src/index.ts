@@ -1,4 +1,4 @@
-import TWEEN from './Tween'
+import TWEEN, { iAnimStateObj } from './Tween'
 import ClockPoll from './ClockPoll'
 import { 
 	XMLNS_XLINK,
@@ -31,7 +31,7 @@ interface iPlineAttrPoint {
 class SvgElem {
 
 	private nextProps: iProps = null
-	private props: iProps = {
+	public props: iProps = {
 		parentDom: null,
 		tag: '',
 		attr: {},
@@ -70,6 +70,14 @@ class SvgElem {
 	public destroy(): void {
 		this.removeFromDom()
 		purgeOwnKeys(this, true)
+	}
+	
+	public getAttr(): object {
+		return Object.assign({}, this.props.attr)
+	}
+
+	public getStyle(): object {
+		return Object.assign({}, this.props.style)
 	}
 
 	private removeFromDom(): void {
@@ -215,8 +223,8 @@ class SvgElem {
 			if(!ClockPoll.isActive()) ClockPoll.start()
 
 			// console.log('current -> end', current, {val:attr[key]})
-			new TWEEN.Tween(current)
-				.to(endState, dur)
+			new TWEEN.Tween(<iAnimStateObj>current)
+				.to(<iAnimStateObj>endState, dur)
 				.easing(easing)
 				.onUpdate(() => {
 					for (let key in current) {
