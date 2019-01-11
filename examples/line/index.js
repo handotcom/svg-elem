@@ -16,25 +16,20 @@ const svg = new SvgElem({
 	},
 })
 
-const circle = new SvgElem({
+const line = new SvgElem({
 	parentDom: svg.elem,
 	tag: 'circle',
 	style: {
-		'fill': 'white',
+		'fill': 'none',
 		'stroke': 'black',
 		'stroke-width': '2px',
-		'cursor': 'pointer',
 	},
 	attr: {
-		'cx': 150,
-		'cy': 150,
-		'r': 50,
+		'x1': 100,
+		'y1': 250,
+		'x2': 400,
+		'y2': 250,
 	},
 })
 
 
-circle.setAttr({
-	'r': 100,
-},{
-	dur: 1000,
-})
