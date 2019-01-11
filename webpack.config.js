@@ -35,22 +35,14 @@ module.exports = {
 	},
 	module: {
 		rules: [ 
-			{
-				test: /\.css$/,
-				use: ['style-loader', 'css-loader']
-			},
-			// {
-			// 	test: /\.m?js$/,
-			// 	exclude: /node_modules/,
-			// 	use: { // Use Babel to transpile .js via babel-loader
-			// 		loader: 'babel-loader',
-			// 	}
-			// }
+			{ test: /\.css$/, use: ['style-loader', 'css-loader']},
+			{ test: /\.ts(x?)$/, loader: 'ts-loader' },
+			{ test: /\.json$/, loader: 'json-loader' },			
 		]
 	},
 	plugins: arrHtmlWebpackPlugins,
 	resolve: {
-		extensions: ['.js']
+		extensions: ['.ts','.js','.json']
 	},
 	devServer: {
 		// contentBase: path.join(__dirname, 'examples'),
