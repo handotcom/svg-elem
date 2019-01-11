@@ -1,4 +1,4 @@
-import TWEEN from 'tween.js'
+import TWEEN from './Tween'
 import ClockPoll from './ClockPoll'
 import { 
 	XMLNS_XLINK,
@@ -69,7 +69,7 @@ class SvgElem {
 
 	public destroy(): void {
 		this.removeFromDom()
-		purgeOwnKeys(this)
+		purgeOwnKeys(this, true)
 	}
 
 	private removeFromDom(): void {
@@ -138,8 +138,8 @@ class SvgElem {
 
 			let easing
 			switch (ease) {
-				case 'linear': easing = TWEEN.Easing.Linear.None; break
-				default: easing = TWEEN.Easing.Cubic.InOut
+				case 'linear': easing = 'Linear'; break
+				default: easing = 'InOutCubic'
 			}
 		
 			let current, endState
