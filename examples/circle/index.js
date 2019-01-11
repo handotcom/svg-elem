@@ -36,5 +36,5 @@ const circle = new SvgElem({
 circle.setAttr({
 	'r': 100,
 },{
-	dur: 1000,
+	dur: 2000,
 })

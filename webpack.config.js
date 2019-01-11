@@ -20,7 +20,7 @@ exampleNames.forEach((name)=>{
 		new HtmlWebpackPlugin({
 			// inject: true,
 			template: path.join(__dirname, `examples/${name}/index.html`),
-			filename: `./dev-server-examples/${name}.html`, // affects path of file hosted by dev server eg. './temp/app.html' --> 'localhost:3001/temp/app.html'
+			filename: `./${name}.html`, // affects path of file hosted by dev server eg. './temp/app.html' --> 'localhost:3001/temp/app.html'
 			chunks: [name], // specify chunks other wise all scripts will be added to every html
 		})
 	)	
