@@ -43,7 +43,7 @@ const circle = new SvgElem({
 
 ## Examples
 
-Some [circles](https://pitchdropobserver.github.io/svg-elem/circles.html).
+Some [circles](https://pitchdropobserver.github.io/svg-elem/circle.html).
 
 
 
