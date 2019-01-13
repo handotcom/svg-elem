@@ -9,7 +9,7 @@ export interface iAnimStateObj {
 	[index: string]: number
 }
 
-class TweenSingle {
+class Tween {
 	private id: string 
 	private startState: iAnimStateObj 
 	private userStateObj: iAnimStateObj 
@@ -28,7 +28,7 @@ class TweenSingle {
 		return this
 	}
 
-	public to(endState: iAnimStateObj, animDur: number): TweenSingle {
+	public to(endState: iAnimStateObj, animDur: number): Tween {
 		const { startState } = this
 		this.endState = endState
 		this.animDur = animDur
@@ -39,22 +39,22 @@ class TweenSingle {
 		return this
 	}
 	
-	public easing(easeType: string): TweenSingle {
+	public easing(easeType: string): Tween {
 		this.easingFunction = EASE[easeType]
 		return this
 	}
 
-	public onUpdate(callback: Function): TweenSingle {
+	public onUpdate(callback: Function): Tween {
 		this.onUpdateCallback = callback
 		return this
 	}
 	
-	public onComplete(callback: Function): TweenSingle {
+	public onComplete(callback: Function): Tween {
 		this.onCompleteCallback = callback
 		return this
 	}
 	
-	public start(): TweenSingle {
+	public start(): Tween {
 		const hashKey = getUniqueHashOnObj(this)
 		this.id = hashKey
 		TWEEN_COLLECTION[hashKey] = this 
@@ -92,13 +92,13 @@ class TweenSingle {
 	}
 }
 
-const TWEEN_COLLECTION: { [index: string]: TweenSingle } = {};
+const TWEEN_COLLECTION: { [index: string]: Tween } = {};
 
-module TWEEN {
-	export const Tween = TweenSingle
-	export function update(timestamp: DOMHighResTimeStamp): void {
+const TWEEN = {
+	Tween,
+	update(timestamp: DOMHighResTimeStamp): void {
 		Object.keys(TWEEN_COLLECTION).forEach((key)=>{
-			const tween: TweenSingle = TWEEN_COLLECTION[key]
+			const tween: Tween = TWEEN_COLLECTION[key]
 			tween.update(timestamp)
 		})
 	}
