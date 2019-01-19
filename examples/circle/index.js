@@ -1,76 +1,56 @@
+import { getDist2Pts, Grid, capBtw } from 'brodash'
+import './style.css'
 import SvgElem from '../../src'
-import { getDist2Pts } from 'brodash'
 const SVG_CONTAINER_ELEM = document.getElementById('root')
-const SVG_W = 600
-const SVG_H = 600
-const CIRC_R = 25
-const SVG_PAD_W = 50
-const SVG_PAD_H = 50
+const WIN_W = window.innerWidth
+const WIN_H = window.innerHeight
+const SMALLEST_WIN_DIM = Math.min(WIN_W, WIN_H)
+const SVG_W = SMALLEST_WIN_DIM * 0.5
+const SVG_H = SMALLEST_WIN_DIM * 0.5
+const SVG_X = (WIN_W - SVG_W) / 2
+const SVG_Y = (WIN_H - SVG_H) / 2
+const CIRC_R = 15 // circle radius
+const CIRC_GAP = 4 // gap size between circles
+const MIN_CIRC_R_SCALE = 0.1 // smallest % of radius circles will shrink down to
+const NUM_X = Math.floor(SVG_W / (CIRC_R * 2 + CIRC_GAP)) // number of circles in x direction
+const NUM_Y = Math.floor(SVG_H / (CIRC_R * 2 + CIRC_GAP)) // number of circles in y direction
 const arrCircles = []
 const LONGEST_DIST_IN_SVG = getDist2Pts(
-	{ x: SVG_W, y: SVG_H},
+	{ x: SVG_W, y: SVG_H },
 	{ x: 0, y: 0 },
 )
+
+document.body.addEventListener('mousemove', (e) => {
+	const { clientX, clientY } = e
+	arrCircles.forEach(circle => {
+		const { cx, cy } = circle.getAttr()
+		const distToPt = getDist2Pts(
+			{ x: clientX, y: clientY },
+			{ x: SVG_X + cx, y: SVG_Y + cy },
+		)
+		const pctMaxDist = Math.max(distToPt, 0.01) / LONGEST_DIST_IN_SVG // distance to pt as a percent of largest possible relative distance in svg space
+		const scaleFactor = capBtw(MIN_CIRC_R_SCALE, 1 - pctMaxDist, 1.0)
+		// console.log('scaleFactor', scaleFactor)
+		circle.setAttr({
+			'r': scaleFactor * CIRC_R
+		})
+	})
+})
 
 const svgContainer = new SvgElem({
 	parentDom: SVG_CONTAINER_ELEM,
 	tag: 'svg',
 	style: {
-		'background': '#eee',
+		'left': SVG_X,
+		'top': SVG_Y,
 	},
 	attr: {
 		'width': SVG_W,
 		'height': SVG_H,
 	},
-	listeners:{
-		'mousemove': (e) => {
-			const { clientX, clientY } = e
-			arrCircles.forEach(circle => {
-				const { cx, cy } = circle.getAttr()
-				const distToPt = getDist2Pts(
-					{ x: clientX, y: clientY },
-					{ x: cx, y: cy },
-				)
-				const pctMaxDist = Math.max(distToPt, 0.01) / LONGEST_DIST_IN_SVG // distance to pt as a percent of largest possible relative distance in svg space
-				const scaleFactor = 1 - pctMaxDist
-				// console.log('scaleFactor', scaleFactor)
-				circle.setAttr({
-					'r': scaleFactor * CIRC_R
-				})
-			})
-		}
-	},
 })
 
-class Grid {
-	constructor(x, y, w, h, nx, ny) {
-		this.arrPts = []
-		const cell_w = w / nx
-		const cell_h = h / ny
-		let i, j
-		for (i = 0; i < nx; i++) {
-			for (j = 0; j < ny; j++) {
-				this.arrPts.push({
-					x: x + cell_w * i,
-					y: y + cell_h * j,
-				})
-			}
-		}
-	}
-	getPts() {
-		return this.arrPts
-	}
-}
-
-
-const grid = new Grid(
-	CIRC_R + SVG_PAD_W / 2, 
-	CIRC_R + SVG_PAD_H / 2,
-	SVG_W - SVG_PAD_W,
-	SVG_H - SVG_PAD_H,
-	10, 
-	10,
-)
+const grid = new Grid(CIRC_R, CIRC_R, SVG_W, SVG_H, NUM_X, NUM_Y)
 
 grid.getPts().forEach(pt => {
 	arrCircles.push(
@@ -86,15 +66,9 @@ grid.getPts().forEach(pt => {
 			attr: {
 				'cx': pt.x,
 				'cy': pt.y,
-				'r': CIRC_R,
+				'r': MIN_CIRC_R_SCALE * CIRC_R,
 			},
 		})
 	)
 })
 
-
-// circle.setAttr({
-// 	'r': 100,
-// },{
-// 	dur: 2000,
-// })

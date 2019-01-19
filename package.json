@@ -1,6 +1,6 @@
 {
   "name": "svg-elem",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Generic animatable svg element creator",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -28,7 +28,7 @@
     "url": "https://github.com/pitchdropobserver/svg-elem/issues"
   },
   "dependencies": {
-    "brodash": "file:../brodash/brodash-1.0.3.tgz"
+    "brodash": "1.0.6"
   },
   "homepage": "https://github.com/pitchdropobserver/svg-elem#readme",
   "devDependencies": {

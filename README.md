@@ -2,6 +2,10 @@
 
 Generic animatable svg elements.
 
+## Examples
+
+1. Some [circles](https://pitchdropobserver.github.io/svg-elem/circle.html).
+
 ## Installation
 
 ```bash
@@ -41,9 +45,7 @@ const circle = new SvgElem({
 })
 ```
 
-## Examples
 
-Some [circles](https://pitchdropobserver.github.io/svg-elem/circle.html).
 
 
 

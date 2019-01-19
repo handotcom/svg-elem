@@ -6,7 +6,6 @@ class ClockPoll {
 
 	constructor(){
 		this.animFrameUpdate = this.animFrameUpdate.bind(this)
-		this.start()
 	}
 
 	public isActive(): boolean {
