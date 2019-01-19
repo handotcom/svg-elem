@@ -28,7 +28,7 @@
     "url": "https://github.com/pitchdropobserver/svg-elem/issues"
   },
   "dependencies": {
-    "brodash": "1.0.6"
+    "brodash": "1.0.7"
   },
   "homepage": "https://github.com/pitchdropobserver/svg-elem#readme",
   "devDependencies": {

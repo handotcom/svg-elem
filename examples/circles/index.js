@@ -1,6 +1,7 @@
 import { getDist2Pts, Grid, capBtw } from 'brodash'
-import './style.css'
 import SvgElem from '../../src'
+import './style.css'
+
 const SVG_CONTAINER_ELEM = document.getElementById('root')
 const WIN_W = window.innerWidth
 const WIN_H = window.innerHeight
@@ -19,23 +20,6 @@ const LONGEST_DIST_IN_SVG = getDist2Pts(
 	{ x: SVG_W, y: SVG_H },
 	{ x: 0, y: 0 },
 )
-
-document.body.addEventListener('mousemove', (e) => {
-	const { clientX, clientY } = e
-	arrCircles.forEach(circle => {
-		const { cx, cy } = circle.getAttr()
-		const distToPt = getDist2Pts(
-			{ x: clientX, y: clientY },
-			{ x: SVG_X + cx, y: SVG_Y + cy },
-		)
-		const pctMaxDist = Math.max(distToPt, 0.01) / LONGEST_DIST_IN_SVG // distance to pt as a percent of largest possible relative distance in svg space
-		const scaleFactor = capBtw(MIN_CIRC_R_SCALE, 1 - pctMaxDist, 1.0)
-		// console.log('scaleFactor', scaleFactor)
-		circle.setAttr({
-			'r': scaleFactor * CIRC_R
-		})
-	})
-})
 
 const svgContainer = new SvgElem({
 	parentDom: SVG_CONTAINER_ELEM,
@@ -58,9 +42,10 @@ grid.getPts().forEach(pt => {
 			parentDom: svgContainer.elem,
 			tag: 'circle',
 			style: {
-				'fill': 'white',
-				'stroke': 'none',
-				// 'stroke-width': '2px',
+				'fill': 'none',
+				'stroke': 'white',
+				'stroke-width': '1px',
+				'stroke-linejoin': 'round',
 				'cursor': 'pointer',
 			},
 			attr: {
@@ -70,5 +55,21 @@ grid.getPts().forEach(pt => {
 			},
 		})
 	)
+})
+
+document.body.addEventListener('mousemove', ({ clientX, clientY }) => {
+	arrCircles.forEach(circle => {
+		const { cx, cy } = circle.getAttr()
+		const distToPt = getDist2Pts(
+			{ x: clientX, y: clientY },
+			{ x: SVG_X + cx, y: SVG_Y + cy },
+		)
+		const pctMaxDist = Math.max(distToPt, 0.01) / LONGEST_DIST_IN_SVG // distance to pt as a percent of largest possible relative distance in svg space
+		const scaleFactor = capBtw(MIN_CIRC_R_SCALE, 1 - pctMaxDist, 1.0)
+		// console.log('scaleFactor', scaleFactor)
+		circle.setAttr({
+			'r': scaleFactor * CIRC_R
+		})
+	})
 })
 
