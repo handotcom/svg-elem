@@ -9,7 +9,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin') // https://github.com/j
 
 
 const exampleNames = fs.readdirSync('./examples').filter((folderName)=>{
-	return !~['dist'].indexOf(folderName)
+	return !~['lib'].indexOf(folderName)
 })
 
 const oWebpackEntries = {}
@@ -30,7 +30,7 @@ module.exports = {
 	entry: oWebpackEntries,
 	// entry: path.join(__dirname, 'examples/src/index.js'), // Resolve source dependencies using examples/src/index.js as a starting point
 	output: {
-		path: path.join(__dirname, 'examples/dist'), // does not effect dev server
+		path: path.join(__dirname, 'examples/lib'), // does not effect dev server
 		filename: '[name].bundle.js'
 	},
 	module: {

@@ -2,11 +2,35 @@
   "name": "svg-elem",
   "version": "1.0.3",
   "description": "Generic animatable svg element creator",
-  "main": "dist/index.js",
-  "directories": {
-    "example": "examples"
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "check-types": "tsc",
+  "files": [
+    "lib/**/*"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack-dev-server --mode development",
+    "build": "webpack --mode production",
+    "deploy": "gh-pages -d examples/lib",
+    "publish-demo": "npm run build && npm run deploy",
+    "prepare": "npm run build-types && npm run build-js",
+    "build-types": "tsc --emitDeclarationOnly",
+    "build-js": "babel src --out-dir lib --extensions \".js,.ts,.tsx\" --source-maps inline"
   },
-  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pitchdropobserver/svg-elem.git"
+  },
+  "author": "pitchdropobserver",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pitchdropobserver/svg-elem/issues"
+  },
+  "dependencies": {
+    "brodash": "file:../brodash/brodash-1.0.3.tgz"
+  },
+  "homepage": "https://github.com/pitchdropobserver/svg-elem#readme",
   "devDependencies": {
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.2.2",
@@ -24,24 +48,5 @@
     "webpack": "^4.28.4",
     "webpack-cli": "^3.2.1",
     "webpack-dev-server": "^3.1.14"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack-dev-server --mode development",
-    "transpile": "babel src --out-dir dist --extensions '.js,.ts,.tsx'",
-    "prepublishOnly": "npm run transpile",
-    "build": "webpack --mode production",
-    "deploy": "gh-pages -d examples/dist",
-    "publish-demo": "npm run build && npm run deploy"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/pitchdropobserver/svg-elem.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/pitchdropobserver/svg-elem/issues"
-  },
-  "homepage": "https://github.com/pitchdropobserver/svg-elem#readme"
+  }
 }

@@ -1,8 +1,8 @@
 import { 
-	EASE,
+	ease,
+	purgeOwnKeys,
 	getUniqueHashOnObj,
-	purgeOwnKeys
-} from './util'
+} from 'brodash'
 
 
 export interface iAnimStateObj {
@@ -14,13 +14,12 @@ class Tween {
 	private startState: iAnimStateObj 
 	private userStateObj: iAnimStateObj 
 	private stateDeltas: iAnimStateObj 
-	private endState: iAnimStateObj 
 
 	private onUpdateCallback: Function 
 	private onCompleteCallback: Function 
 	private tStart: number
 	private animDur: number 
-	private easingFunction: Function = EASE.InOutCubic
+	private easingFunction: Function = ease.InOutCubic
 
 	constructor(userStateObj: iAnimStateObj){
 		this.startState = Object.assign({}, userStateObj)
@@ -30,7 +29,6 @@ class Tween {
 
 	public to(endState: iAnimStateObj, animDur: number): Tween {
 		const { startState } = this
-		this.endState = endState
 		this.animDur = animDur
 		this.stateDeltas = Object.keys(startState).reduce((prev, key)=>{
 			prev[key] = (endState[key] - startState[key]) 
@@ -40,7 +38,7 @@ class Tween {
 	}
 	
 	public easing(easeType: string): Tween {
-		this.easingFunction = EASE[easeType]
+		this.easingFunction = ease[easeType]
 		return this
 	}
 

@@ -1,5 +1,5 @@
 import SvgElem from '../../src'
-
+import { getDist2Pts } from 'brodash'
 const SVG_CONTAINER_ELEM = document.getElementById('root')
 const SVG_W = 600
 const SVG_H = 600
@@ -11,22 +11,6 @@ const LONGEST_DIST_IN_SVG = getDist2Pts(
 	{ x: SVG_W, y: SVG_H},
 	{ x: 0, y: 0 },
 )
-
-function getDist2Pts(ptA, ptB) {
-	if (ptA.hasOwnProperty('length')) { // array format
-		switch (ptA.length) {
-			case 2: return Math.sqrt(Math.pow(ptB[0] - ptA[0], 2) + Math.pow(ptB[1] - ptA[1], 2))
-			case 3: return Math.sqrt(Math.pow(ptB[0] - ptA[0], 2) + Math.pow(ptB[1] - ptA[1], 2) + Math.pow(ptB[2] - ptA[2], 2))
-				break
-		}
-	} else { // object format
-		if (ptA.z) {
-			return Math.sqrt(Math.pow(ptB.x - ptA.x, 2) + Math.pow(ptB.y - ptA.y, 2) + Math.pow(ptB.z - ptA.z, 2))
-		} else {
-			return Math.sqrt(Math.pow(ptB.x - ptA.x, 2) + Math.pow(ptB.y - ptA.y, 2))
-		}
-	}
-}
 
 const svgContainer = new SvgElem({
 	parentDom: SVG_CONTAINER_ELEM,

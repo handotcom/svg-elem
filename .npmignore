@@ -1,5 +1,7 @@
 src
 examples
 .gitignore
-webpack.config.js
 .babelrc
+webpack.config.js
+tsconfig.json
+tslint.json

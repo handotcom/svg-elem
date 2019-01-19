@@ -1,11 +1,11 @@
+import { 
+	purgeOwnKeys,
+	createSvgElement,
+	plinePtConvert,
+	XMLNS_XLINK,
+} from 'brodash'
 import TWEEN, { iAnimStateObj } from './Tween'
 import ClockPoll from './ClockPoll'
-import { 
-	XMLNS_XLINK,
-	createSvgElement, 
-	purgeOwnKeys,
-	plinePtConvert,
-} from './util'
 
 
 interface iProps {
@@ -177,7 +177,7 @@ class SvgElem {
 							this.endState[key] = 1.0
 						} break;
 						case 'class':
-						case 'id':
+						case 'id':												
 							break
 						default: // all other directly tweenable attributes
 							this.current[key] = Number(elem.getAttribute(key))
