@@ -4,8 +4,8 @@ Generic animatable svg elements.
 
 ## Examples
 
-1. Some [circles](https://pitchdropobserver.github.io/svg-elem/circles.html).
-2. A [polygon](https://pitchdropobserver.github.io/svg-elem/polygon.html).
+1. some [circles](https://pitchdropobserver.github.io/svg-elem/circles.html).
+2. a [polygon](https://pitchdropobserver.github.io/svg-elem/polygon.html).
 
 ## Installation
 
@@ -46,7 +46,25 @@ const circle = new SvgElem({
 })
 ```
 
+## Required Props
 
+Props you must specify:
 
+* `parentDom` - the DOM element that contains your element
+* `tag` - element name of the SVG
 
+## Optional Props
+
+Props you can optionally specify:
+
+* `attr` - SVG element attributes
+* `style` - SVG element styles
+* `text` - text content for svg texts
+
+## Methods 
+
+Methods you can specify:
+
+* `setAttr(oParam, shouldAnimate)` - updates SVG's attributes
+* `setStyle(oParam, shouldAnimate)` - updates SVG's styles
 
