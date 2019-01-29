@@ -1,4 +1,7 @@
-import { getDist2Pts, Grid, capBtw } from 'brodash'
+import { 
+	getDist2Pts, Grid, capBtw 
+// } from '../../../brodash/lib'
+} from 'brodash'
 import SvgElem from '../../src'
 import './style.css'
 

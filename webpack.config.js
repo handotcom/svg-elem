@@ -7,9 +7,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin') // https://github.com/j
 // 	filename: './index.html', // Automatically inject a script reference to the bundle output in 
 // })
 
-
+const SKIPPED_FOLDERS = ['lib']
 const exampleNames = fs.readdirSync('./examples').filter((folderName)=>{
-	return !~['lib'].indexOf(folderName)
+	return !~SKIPPED_FOLDERS.indexOf(folderName)
 })
 
 const oWebpackEntries = {}
@@ -35,9 +35,10 @@ module.exports = {
 	},
 	module: {
 		rules: [ 
-			{ test: /\.css$/, use: ['style-loader', 'css-loader']},
+			{ test: /\.css$/, loader: ['style-loader', 'css-loader']},
 			{ test: /\.ts(x?)$/, loader: 'ts-loader' },
-			{ test: /\.json$/, loader: 'json-loader' },			
+			{ test: /\.json$/, loader: 'json-loader' },	
+			{ test: /\.(js|jsx)$/, loader: 'babel-loader', exclude: /node_modules/ },			
 		]
 	},
 	plugins: arrHtmlWebpackPlugins,

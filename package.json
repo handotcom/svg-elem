@@ -1,6 +1,6 @@
 {
   "name": "svg-elem",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Generic animatable svg element creator",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -28,8 +28,11 @@
   "bugs": {
     "url": "https://github.com/pitchdropobserver/svg-elem/issues"
   },
+  "peerDependencies": {
+    "inbtwn": "^1.0.0"
+  },
   "dependencies": {
-    "brodash": "1.0.7"
+    "brodash": "^1.0.10"
   },
   "devDependencies": {
     "@babel/cli": "^7.2.3",
@@ -38,6 +41,7 @@
     "@babel/plugin-proposal-object-rest-spread": "^7.2.0",
     "@babel/preset-env": "^7.2.3",
     "@babel/preset-typescript": "^7.1.0",
+    "babel-loader": "^8.0.5",
     "css-loader": "^2.1.0",
     "gh-pages": "^2.0.1",
     "html-webpack-plugin": "^3.2.0",

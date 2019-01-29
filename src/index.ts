@@ -1,56 +1,35 @@
 import { 
 	purgeOwnKeys,
 	createSvgElement,
-	plinePtConvert,
-	XMLNS_XLINK,
 } from 'brodash'
-import TWEEN, { iAnimStateObj } from './Tween'
-import ClockPoll from './ClockPoll'
+import {
+	collectChanges,
+	setAttrDirectly,
+	setAttrAnimated,
+	setAttrPolylinePoints,
+} from './util'
+import {
+	IProps,
+	IAttr,
+	IAnim,
+} from './util'
 
 
-interface iProps {
-	parentDom: HTMLElement
-	tag: string
-	style: any
-	attr: any
-	text?: string | Array<string>
-	listeners?: object
-}
-
-interface iAnim {
-	dur: number
-	ease?: string
-}
-
-interface iPlineAttrPoint {
-	start: Array<number>
-	end: Array<number>
-	delta: Array<number>
-}
 
 class SvgElem {
 
-	private nextProps: iProps = null
-	public props: iProps = {
+	private nextProps: IProps = null
+	public props: IProps = {
 		parentDom: null,
 		tag: '',
-		attr: {},
+		attr: <IAttr>{},
 		style: {},
 	}
 	public elem: HTMLElement = null
 	private arrTSpan: Array<HTMLElement>
-	// animation helpers
-	private current: object = null
-	private endState: object = null
-	// special attributes
-	private plineAttrPoint: iPlineAttrPoint = {
-		start:[],
-		end:[],
-		delta:[],
-	} // initial value of 'points' attribute for <polyline>, used as ref value for tweening...
 	private textLineHeight: number = 0
 
-	constructor(op: iProps){
+	constructor(op: IProps){
 		this.nextProps = Object.assign({}, op)
 		this.init() // initialize using nextProps...
 	}
@@ -64,7 +43,7 @@ class SvgElem {
 	}
 
 	private createElement(tag: string, parentDom: HTMLElement): void {
-		this.elem = createSvgElement(tag, parentDom)
+		this.elem = <HTMLElement>createSvgElement(tag, parentDom)
 	}
 
 	public destroy(): void {
@@ -90,7 +69,7 @@ class SvgElem {
 	}
 
 	// for convenience
-	public getId(): void {
+	public getId(): string|number|undefined {
 		return this.props.attr.id
 	}
 
@@ -103,7 +82,6 @@ class SvgElem {
 		const { attr, style, tag, text } = this.nextProps
 		this.setAttr(attr)
 		this.setStyle(style)
-
 		if (tag === 'text' && text !== undefined) {
 			this.setText(text)
 		}
@@ -116,7 +94,7 @@ class SvgElem {
 		if (text) this.setText(text)
 	}
 
-	private attachEventListeners(listeners): void {
+	private attachEventListeners(listeners: Object): void {
 		if (listeners !== undefined) {
 			for (let eventType in listeners) {
 				if (listeners.hasOwnProperty(eventType)) {
@@ -137,118 +115,26 @@ class SvgElem {
 		}
 	}
 
-	public setAttr(attr: object, anim?: iAnim): Promise<void> {
+	public setAttr(attr: IAttr, anim?: IAnim): Promise<void> | undefined {
 		const { elem, props } = this
-		if (anim) { // animate to new attributes...
-			const { dur, ease } = anim
-			this.current = null // clear states
-			this.endState = null
-
-			let easing
-			switch (ease) {
-				case 'linear': easing = 'Linear'; break
-				default: easing = 'InOutCubic'
-			}
-		
-			let current, endState
-			let plineAttrPoint = {} // eg. <polyline points="20,20 40,25"/>
-
-			for (let key in attr) {
-				if (
-					attr.hasOwnProperty(key)
-					&& attr[key] !== props.attr[key] // if value changed...
-					// && typeof attr[key] !== 'function'
-				) {
-					if (this.current === null) {
-						this.current = {}
-						this.endState = {}
-					}
-
-					switch (key) {
-						case 'points': { // for <polyline>...
-							const { plineAttrPoint } = this
-							// start & end must have same number of points
-							plineAttrPoint.start = plinePtConvert(elem.getAttribute(key))
-							plineAttrPoint.end = plinePtConvert(attr[key])
-							plineAttrPoint.delta = plineAttrPoint.end.map(function (num, i) {
-								return num - plineAttrPoint.start[i]
-							})
-							this.current[key] = 0.0
-							this.endState[key] = 1.0
-						} break;
-						case 'class':
-						case 'id':												
-							break
-						default: // all other directly tweenable attributes
-							this.current[key] = Number(elem.getAttribute(key))
-							this.endState[key] = attr[key]
-					}
-				}
-			}
-
-			if (this.current !== null) {
-				return this.animateAttr(dur, easing).then(() => {
-					Object.assign(this.props.attr, attr) // overwrite props after animation has finished...
-				})
+		const changedAttr = collectChanges<IAttr>(props.attr, attr)
+		if (changedAttr !== undefined){ // has changes...
+			const oldAttr: IAttr = Object.assign({}, props.attr)
+			Object.assign(props.attr, changedAttr) // overwrite existing props
+			if (anim !== undefined) { // if anim option provided...
+				// custom tween methods for certain attributes...
+				if (changedAttr['points'] !== undefined) { 
+					// for <polyline/> & <polygon/>
+					// developer.mozilla.org/en-US/docs/Web/SVG/Attribute/points
+					return setAttrPolylinePoints(elem, oldAttr.points, changedAttr.points, anim)
+				} else { // all other directly tweenable svg attributes
+					return setAttrAnimated(elem, oldAttr, changedAttr, anim)
+				}				
 			} else {
-				Object.assign(props.attr, attr)
-				return Promise.resolve()
+				
+				setAttrDirectly(elem, changedAttr)
 			}
-
-		} else { // set without animation...
-			let key, val
-			for (key in attr) {
-				val = attr[key]
-				if (
-					attr.hasOwnProperty(key) // if key exists...
-					&& val !== props.attr[key] // if value changed...
-					&& typeof val !== 'function'
-				) {
-					switch (key) {
-						case 'xlink:href':
-							elem.setAttributeNS(XMLNS_XLINK, 'href', val) // must set as 'href' and NOT 'xlink:href'
-							break;
-						default:
-							elem.setAttributeNS(null, key, val)
-					}
-				}
-			}
-			Object.assign(props.attr, attr) // overwrite props with nextProps
-		}
-	}
-
-	private animateAttr(dur: number, easing: string): Promise<void> {
-		const { current, endState, elem } = this
-		return new Promise((resolve) => {
-			if(!ClockPoll.isActive()) ClockPoll.start()
-
-			// console.log('current -> end', current, {val:attr[key]})
-			new TWEEN.Tween(<iAnimStateObj>current)
-				.to(<iAnimStateObj>endState, dur)
-				.easing(easing)
-				.onUpdate(() => {
-					for (let key in current) {
-						// eg. <polyline points="20,20 40,25"/>
-						switch (key) {
-							case 'points': { // for <polyline>...
-								const { start, delta } = this.plineAttrPoint
-								const ratio = current[key] // percentage indicating tweening progress...
-								// transform from coordinates back into attribute string
-								const strAttr = start.map((num, i) => {
-									return num + delta[i] * ratio
-								}).join(',')
-								elem.setAttributeNS(null, key, strAttr)
-							} break;
-							default: // all other directly tweenable attributes
-								elem.setAttributeNS(null, key, current[key])
-						}
-					}
-				})
-				.onComplete(() => {
-					resolve()
-				})
-				.start()
-		})
+		}	
 	}
 
 	public setText(val: any): void {
@@ -296,10 +182,10 @@ class SvgElem {
 		props.text = val // overwrite props with nextProps
 	}
 
-	public setStyle(style: object, anim?: iAnim): void {
+	public setStyle(style: object, anim?: IAnim): void {
 		const { elem, props } = this
-		let key,
-			changeCount = 0
+		let key: string,
+			changeCount: number = 0
 		for (key in style) {
 			if (
 				style.hasOwnProperty(key)
