@@ -28,10 +28,8 @@
   "bugs": {
     "url": "https://github.com/pitchdropobserver/svg-elem/issues"
   },
-  "peerDependencies": {
-    "inbtwn": "^1.0.0"
-  },
   "dependencies": {
+    "inbtwn": "^1.0.0",
     "brodash": "^1.0.10"
   },
   "devDependencies": {

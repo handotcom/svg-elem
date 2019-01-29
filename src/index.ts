@@ -1,17 +1,21 @@
 import { 
 	purgeOwnKeys,
-	createSvgElement,
+	// createSvgElement,
 } from 'brodash'
 import {
 	collectChanges,
 	setAttrDirectly,
 	setAttrAnimated,
 	setAttrPolylinePoints,
+	setTSpans,
 } from './util'
 import {
 	IProps,
 	IAttr,
+	IStyle,
 	IAnim,
+	TText,
+	createSvgElement, // TODO: remove on next brodash release
 } from './util'
 
 
@@ -23,11 +27,10 @@ class SvgElem {
 		parentDom: null,
 		tag: '',
 		attr: <IAttr>{},
-		style: {},
+		style: <IStyle>{},
 	}
-	public elem: HTMLElement = null
-	private arrTSpan: Array<HTMLElement>
-	private textLineHeight: number = 0
+	public elem: SVGSVGElement = null
+	private textElemTSpans: Array<SVGSVGElement> = []
 
 	constructor(op: IProps){
 		this.nextProps = Object.assign({}, op)
@@ -42,8 +45,8 @@ class SvgElem {
 		Object.assign(this.props, this.nextProps)
 	}
 
-	private createElement(tag: string, parentDom: HTMLElement): void {
-		this.elem = <HTMLElement>createSvgElement(tag, parentDom)
+	private createElement(tag: string, parentDom: Element): void {
+		this.elem = createSvgElement(tag, parentDom)
 	}
 
 	public destroy(): void {
@@ -130,81 +133,51 @@ class SvgElem {
 				} else { // all other directly tweenable svg attributes
 					return setAttrAnimated(elem, oldAttr, changedAttr, anim)
 				}				
-			} else {
-				
+			} else {				
 				setAttrDirectly(elem, changedAttr)
 			}
 		}	
 	}
 
-	public setText(val: any): void {
-		const { elem, arrTSpan, textLineHeight, props } = this
-
-		switch (typeof val) {
-			case 'string':
-			case 'number': {  // single text item...
-				elem.textContent = String(val)
-			} break
-			case 'object': { // array of text items...
-				if (Array.isArray(val)) {
-					// NOTE: 'alignment-baseline' does not work on tspans
-					// <tspan dx="50,10,10,0,5" dy="50,10,10,10">SVG 2</tspan>
-					const { x } = props.attr
-
-					let tspan, exstTspan, dy
-					for (let i = 0; i < val.length; i++) {
-						if (arrTSpan[i] === undefined) { // if tspan do not exist...
-							tspan = createSvgElement('tspan', elem) // create new element
-							arrTSpan.push(tspan)
-						} else {  // if tspan already exist...
-							tspan = arrTSpan[i] // reference exsiting element
-						}
-
-						tspan.textContent = val[i]
-						// calc & record character height if not yet determined...
-						if (!textLineHeight) {
-							this.textLineHeight = tspan.getBBox().height
-						}
-						tspan.setAttributeNS(null, 'x', x)
-						tspan.setAttributeNS(null, 'dy', this.textLineHeight)
-					}
-
-					// purge legacy tspans no longer used...
-					const deltaListLen = arrTSpan.length - val.length
-					if (deltaListLen > 0) { // if new items fewer than already created...
-						for (let i = 0; i < deltaListLen; i++) {
-							elem.removeChild(arrTSpan.pop())
-						}
-					}
-				}
-			} break
-		}
-		props.text = val // overwrite props with nextProps
-	}
-
-	public setStyle(style: object, anim?: IAnim): void {
+	public setStyle(style: IStyle, anim?: IAnim): void {
 		const { elem, props } = this
-		let key: string,
-			changeCount: number = 0
-		for (key in style) {
-			if (
-				style.hasOwnProperty(key)
-				&& style[key] !== props.style[key] // if value changed...
-			) {
-				elem.style[key] = style[key]
-				changeCount += 1
-				if (props.tag === 'text') {
-					if (key === 'font-family' || key === 'font-size') {
-						this.textLineHeight = null // reset line height on font change			
-						this.setText(props.text)
-					}
+		const changedStyle = collectChanges<IStyle>(props.style, style)
+		if (changedStyle !== undefined){
+			Object.assign(props.style, changedStyle) // update props...
+			const isTextElem = props.tag === 'text'
+			let key: string,
+				shouldResetText: boolean = false
+			for (key in changedStyle) {
+				elem.style[key] = changedStyle[key] // update DOM
+				if (isTextElem) {
+					switch (key) {
+						case 'font-family':
+						case 'font-size':							
+							// certain style change requires re-calculation of line height, which is done by re-setting text content
+							shouldResetText = true
+							break;
+					}						
 				}
 			}
+			if(shouldResetText) this.setText(props.text)
 		}
+	}
 
-		if (changeCount > 0){
-			Object.assign(props.style, style) // overwrite props with nextProps
-		}    
+	public setText(val: TText): void {
+		const { elem, textElemTSpans, props } = this
+		switch (typeof val) {
+			case 'string':
+			case 'number': // single text item...
+				elem.textContent = String(val)
+				props.text = val // update props
+				break
+			case 'object':
+				if (Array.isArray(val)) { // if array of text items...
+					setTSpans(elem, textElemTSpans, val, +props.attr.x)
+					props.text = val // update props
+				}
+				break
+		}
 	}
 
 }
